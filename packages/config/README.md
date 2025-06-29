@@ -22,32 +22,44 @@ yarn add @future.ai/config
 
 ## Usage
 
-### Basic Setup
+### Step 1: Create Config Registry (Critical for Type Safety!)
+
+First, create a centralized config registry. The `CONFIG_REGISTRY` constant with `as const` is **essential** for proper TypeScript type inference:
 
 ```typescript
-import { ConfigModule, defineConfig } from '@future.ai/config';
+// src/common/config/index.ts
+import { defineConfig } from '@future.ai/config';
 
-// Define your configurations
-const appConfig = defineConfig('app', () => ({
-  name: 'My App',
-  port: 3000,
-  version: '1.0.0'
+export const BASE_CONFIG_ENTRY = defineConfig('base', () => ({
+  PORT: process.env.PORT || "3000",
 }));
 
-const databaseConfig = defineConfig('database', () => ({
-  host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  name: process.env.DB_NAME || 'myapp'
+export const POSTGRES_CONFIG_ENTRY = defineConfig('postgres', () => ({
+  POSTGRES_HOST: process.env.DB_HOST,
+  POSTGRES_PORT: parseInt(process.env.DB_PORT || "5432", 10),
+  POSTGRES_USERNAME: process.env.DB_USERNAME,
+  POSTGRES_PASSWORD: process.env.DB_PASSWORD,
+  POSTGRES_DATABASE: process.env.DB_NAME,
 }));
 
-// Register configurations
+// ⚠️ CRITICAL: The 'as const' is essential for proper type inference!
+export const CONFIG_REGISTRY = {
+  base: BASE_CONFIG_ENTRY,
+  postgres: POSTGRES_CONFIG_ENTRY,
+} as const;
+```
+
+### Step 2: Register in App Module
+
+```typescript
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@future.ai/config';
+import { CONFIG_REGISTRY } from './common/config';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
-      registry: {
-        app: appConfig,
-        database: databaseConfig
-      },
+      registry: CONFIG_REGISTRY,
       isGlobal: true // Optional, defaults to true
     })
   ]
@@ -55,44 +67,166 @@ const databaseConfig = defineConfig('database', () => ({
 export class AppModule {}
 ```
 
-### Using Configuration Service
+### Step 3: Use in Services with Full Type Safety
 
 ```typescript
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@future.ai/config';
+import { CONFIG_REGISTRY } from '../common/config';
 
 @Injectable()
-export class SomeService {
-  constructor(private configService: ConfigService) {}
+export class DatabaseService {
+  constructor(
+    private configService: ConfigService<typeof CONFIG_REGISTRY>
+  ) {}
 
-  someMethod() {
-    // Type-safe access to configuration
-    const appName = this.configService.get('app').name;
-    const dbHost = this.configService.get('database').host;
+  async connect() {
+    // ✅ Fully type-safe access to configuration
+    const dbConfig = this.configService.get('postgres');
+    const host = dbConfig.POSTGRES_HOST;     // string | undefined
+    const port = dbConfig.POSTGRES_PORT;     // number
     
-    // Path-based access
-    const appPort = this.configService.get('app.port');
-    const dbPort = this.configService.get('database.port');
+    // ✅ Path-based access with type safety
+    const dbHost = this.configService.get('postgres.POSTGRES_HOST');
+    const basePort = this.configService.get('base.PORT');
+    
+    // TypeScript will catch errors at compile time!
+    // const invalid = this.configService.get('nonexistent'); // ❌ Error!
   }
 }
 ```
 
-### Advanced Configuration Factory
+### Advanced Configuration Patterns
+
+#### Environment-specific Configurations
+
+```typescript
+export const APP_CONFIG_ENTRY = defineConfig('app', () => ({
+  name: 'My NestJS App',
+  environment: process.env.NODE_ENV || 'development',
+  debug: process.env.NODE_ENV === 'development',
+  cors: {
+    origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+    credentials: true
+  }
+}));
+
+export const REDIS_CONFIG_ENTRY = defineConfig('redis', () => ({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  ttl: parseInt(process.env.REDIS_TTL || '3600'),
+  password: process.env.REDIS_PASSWORD
+}));
+
+export const CONFIG_REGISTRY = {
+  app: APP_CONFIG_ENTRY,
+  postgres: POSTGRES_CONFIG_ENTRY,
+  redis: REDIS_CONFIG_ENTRY,
+} as const; // ⚠️ Never forget 'as const'!
+```
+
+#### Using createConfig for Static Configurations
 
 ```typescript
 import { createConfig } from '@future.ai/config';
 
-const advancedConfig = createConfig('advanced', {
-  redis: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    ttl: 3600
-  },
-  features: {
-    enableCache: process.env.ENABLE_CACHE === 'true',
-    maxRetries: parseInt(process.env.MAX_RETRIES || '3')
-  }
+export const STATIC_CONFIG_ENTRY = createConfig('static', {
+  apiVersion: 'v1',
+  maxUploadSize: 10 * 1024 * 1024, // 10MB
+  supportedFormats: ['jpg', 'png', 'pdf'] as const
 });
+```
+
+## 🚨 Why CONFIG_REGISTRY and 'as const' are Critical
+
+### The Problem Without Proper Type Registry
+
+```typescript
+// ❌ DON'T DO THIS - Loses type safety!
+const badRegistry = {
+  base: defineConfig('base', () => ({ PORT: "3000" })),
+  postgres: defineConfig('postgres', () => ({ HOST: "localhost" }))
+}; // Missing 'as const'
+
+// ConfigService<typeof badRegistry> won't have proper type inference
+// You'll lose autocomplete and type checking!
+```
+
+### The Solution: Centralized Registry with 'as const'
+
+```typescript
+// ✅ DO THIS - Perfect type safety!
+export const CONFIG_REGISTRY = {
+  base: BASE_CONFIG_ENTRY,
+  postgres: POSTGRES_CONFIG_ENTRY,
+} as const; // This makes TypeScript preserve exact literal types
+```
+
+### Benefits of This Pattern
+
+1. **🔒 Complete Type Safety**: TypeScript knows exactly what keys and values exist
+2. **🎯 Intellisense**: Full autocomplete in your IDE
+3. **🛡️ Compile-time Errors**: Catch typos and invalid access patterns before runtime
+4. **📚 Self-documenting**: The registry serves as documentation of all available configs
+5. **🧪 Testable**: Easy to mock and test configuration values
+
+### Type Safety in Action
+
+```typescript
+// With proper CONFIG_REGISTRY setup:
+const service = new ConfigService<typeof CONFIG_REGISTRY>();
+
+// ✅ These work with full type checking:
+service.get('postgres')                    // Type: { POSTGRES_HOST: string | undefined, ... }
+service.get('postgres.POSTGRES_HOST')      // Type: string | undefined
+service.get('base.PORT')                   // Type: string
+
+// ❌ These cause compile-time errors:
+service.get('nonexistent')                 // Error: Argument of type 'nonexistent' is not assignable
+service.get('postgres.WRONG_FIELD')        // Error: Property 'WRONG_FIELD' does not exist
+```
+
+## 🏆 Best Practices
+
+### 1. Always Use a Central Registry File
+
+```typescript
+// src/common/config/index.ts - Single source of truth
+export const CONFIG_REGISTRY = {
+  // All your configs here
+} as const;
+```
+
+### 2. Type Your ConfigService
+
+```typescript
+// Always import and type your ConfigService
+import { CONFIG_REGISTRY } from '../common/config';
+
+constructor(
+  private configService: ConfigService<typeof CONFIG_REGISTRY>
+) {}
+```
+
+### 3. Use Environment Variables with Defaults
+
+```typescript
+export const API_CONFIG_ENTRY = defineConfig('api', () => ({
+  port: parseInt(process.env.API_PORT || '3000'),
+  host: process.env.API_HOST || 'localhost',
+  timeout: parseInt(process.env.API_TIMEOUT || '5000'),
+}));
+```
+
+### 4. Group Related Configurations
+
+```typescript
+export const DATABASE_CONFIG_ENTRY = defineConfig('database', () => ({
+  // All database-related configs together
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  // ... other db configs
+}));
 ```
 
 ## API Reference
