@@ -8,7 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
-    "incremental": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "skipLibCheck": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
@@ -18,5 +19,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "lib": ["ES2021"]
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }
