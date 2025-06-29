@@ -1,7 +1,10 @@
+const base = require('../../jest.config.js');
+
 module.exports = {
+  ...base,
   displayName: '@future.ai/common',
-  preset: '../../jest.config.js',
   rootDir: '.',
+  roots: ['<rootDir>'],
   testMatch: ['<rootDir>/test/**/*.spec.ts'],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.ts',
