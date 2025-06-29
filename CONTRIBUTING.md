@@ -7,7 +7,7 @@ Thank you for your interest in contributing to @future.ai libraries! This guide 
 1. Fork and clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 3. Create a new branch:
    ```bash
@@ -30,28 +30,28 @@ This creates a new package with all necessary configuration files.
 2. Write/update tests
 3. Run tests to ensure everything works:
    ```bash
-   npm test
+   pnpm test
    ```
 4. Build the package:
    ```bash
-   npm run build
+   pnpm run build
    ```
 5. Lint your code:
    ```bash
-   npm run lint
+   pnpm run lint
    ```
 
 ## Testing
 
 - Write unit tests for all new functionality
 - Place tests in the `test` directory of the package
-- Run tests with `npm test`
+- Run tests with `pnpm test`
 - Aim for high code coverage
 
 ## Code Style
 
 - We use ESLint and Prettier for code formatting
-- Run `npm run format` to format your code
+- Run `pnpm run format` to format your code
 - Follow NestJS best practices and conventions
 
 ## Commit Messages

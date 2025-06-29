@@ -20,15 +20,15 @@ fi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-npm install
+pnpm install
 
 # Run tests
 echo "🧪 Running tests..."
-npm test
+pnpm test
 
 # Build all packages
 echo "🔨 Building packages..."
-npm run build
+pnpm run build
 
 # Version and publish
 echo "📝 Versioning and publishing..."

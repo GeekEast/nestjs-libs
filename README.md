@@ -13,7 +13,7 @@ A collection of high-quality, reusable NestJS libraries published under the @fut
 ### Prerequisites
 
 - Node.js >= 16
-- npm >= 8
+- pnpm >= 8
 
 ### Installation
 
@@ -23,26 +23,26 @@ git clone https://github.com/future-ai/nestjs-libs.git
 cd future-ai-libs
 
 # Install dependencies
-npm install
+pnpm install
 
 # Bootstrap packages
-npm run bootstrap
+pnpm run bootstrap
 ```
 
 ### Development
 
 ```bash
 # Build all packages
-npm run build
+pnpm run build
 
 # Run tests
-npm test
+pnpm test
 
 # Lint code
-npm run lint
+pnpm run lint
 
 # Format code
-npm run format
+pnpm run format
 ```
 
 ## 📝 Creating a New Package
@@ -64,14 +64,14 @@ This will create a new package with:
 To build all packages:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 To build a specific package:
 
 ```bash
 cd packages/common
-npm run build
+pnpm run build
 ```
 
 ## 🧪 Testing
@@ -79,14 +79,14 @@ npm run build
 Run all tests:
 
 ```bash
-npm test
+pnpm test
 ```
 
 Run tests for a specific package:
 
 ```bash
 cd packages/common
-npm test
+pnpm test
 ```
 
 ## 📤 Publishing
@@ -94,7 +94,7 @@ npm test
 Before publishing, ensure you're logged into npm with access to the @future.ai organization:
 
 ```bash
-npm login
+pnpm login
 ```
 
 To publish all changed packages:
@@ -130,7 +130,7 @@ future-ai-libs/
 1. Create a new branch for your feature
 2. Make your changes
 3. Write/update tests
-4. Run `npm test` and `npm run lint`
+4. Run `pnpm test` and `pnpm run lint`
 5. Submit a pull request
 
 ## 📄 License
