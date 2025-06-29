@@ -45,5 +45,6 @@
     "@nestjs/testing": "^10.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
-  }
+  },
+  "gitHead": "2ed3b4ab5ca7be54f277edad77cb3791bf861f0d"
 }
