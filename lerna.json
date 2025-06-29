@@ -6,7 +6,14 @@
       "conventionalCommits": true,
       "message": "chore(release): publish",
       "registry": "https://registry.npmjs.org",
-      "allowBranch": ["main", "master"]
+      "allowBranch": ["main", "master"],
+      "yes": true
+    },
+    "version": {
+      "conventionalCommits": true,
+      "message": "chore(release): update versions",
+      "allowBranch": ["main", "master"],
+      "yes": true
     },
     "bootstrap": {
       "hoist": true

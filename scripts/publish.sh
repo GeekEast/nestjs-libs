@@ -12,8 +12,11 @@ if [ "$BRANCH" != "main" ] && [ "$BRANCH" != "master" ]; then
   exit 1
 fi
 
-# Note: We don't check for clean working directory here because
-# lerna publish will handle versioning and committing automatically
+# Ensure working directory is clean
+if [ -n "$(git status --porcelain)" ]; then
+  echo "❌ Working directory is not clean. Please commit or stash changes first."
+  exit 1
+fi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
@@ -27,8 +30,12 @@ pnpm test
 echo "🔨 Building packages..."
 pnpm run build
 
-# Version and publish
-echo "📝 Versioning and publishing..."
-npx lerna publish --conventional-commits
+# Version first (this will create commits and tags)
+echo "📝 Creating new versions..."
+npx lerna version --conventional-commits --yes
+
+# Then publish the tagged versions
+echo "🚀 Publishing to npm..."
+npx lerna publish from-git --yes
 
 echo "✅ Publishing complete!"
