@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/future-ai/nestjs-libs/compare/@future.ai/config@0.2.1...@future.ai/config@0.2.2) (2025-06-29)
+
+### Bug Fixes
+
+- **config:** ensure dist directory is included in published package ([12837b1](https://github.com/future-ai/nestjs-libs/commit/12837b17ea7315027c588afaf11ac919ab29ec4b))
+
 ## [0.2.1](https://github.com/future-ai/nestjs-libs/compare/@future.ai/config@0.2.0...@future.ai/config@0.2.1) (2025-06-29)
 
 **Note:** Version bump only for package @future.ai/config
