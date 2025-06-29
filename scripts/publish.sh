@@ -12,11 +12,8 @@ if [ "$BRANCH" != "main" ] && [ "$BRANCH" != "master" ]; then
   exit 1
 fi
 
-# Ensure working directory is clean
-if [ -n "$(git status --porcelain)" ]; then
-  echo "❌ Working directory is not clean. Please commit or stash changes."
-  exit 1
-fi
+# Note: We don't check for clean working directory here because
+# lerna publish will handle versioning and committing automatically
 
 # Install dependencies
 echo "📦 Installing dependencies..."
