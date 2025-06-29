@@ -1,12 +1,57 @@
 # @future.ai NestJS Libraries Monorepo
 
-A collection of high-quality, reusable NestJS libraries published under the @future.ai organization.
+A collection of high-quality, reusable NestJS libraries published under the @future.ai organization. Currently focused on type-safe configuration management for enterprise NestJS applications.
 
 ## 📦 Packages
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [@future.ai/common](./packages/common) | 0.0.1 | Common utilities and decorators for NestJS applications |
+| [@future.ai/config](./packages/config) | 0.2.1 | Type-safe configuration management for NestJS applications |
+
+## ✨ @future.ai/config Features
+
+Our flagship package provides enterprise-grade configuration management:
+
+- 🔒 **Complete Type Safety**: Full TypeScript support with intelligent autocomplete
+- 🏗️ **Flexible Registry**: Register configurations with custom keys and types  
+- 🔍 **Path-based Access**: Access nested configuration values using dot notation
+- 🌍 **Global Module**: Optional global configuration service
+- ⚡ **High Performance**: Cached configuration values for fast access
+- 🧪 **Testable**: Easy to mock and test configuration values
+
+### Quick Example
+
+```typescript
+// Define your configurations
+export const CONFIG_REGISTRY = {
+  base: defineConfig('base', () => ({
+    PORT: process.env.PORT || "3000",
+  })),
+  database: defineConfig('database', () => ({
+    HOST: process.env.DB_HOST,
+    PORT: parseInt(process.env.DB_PORT || "5432"),
+  }))
+} as const;
+
+// Register in your app
+@Module({
+  imports: [ConfigModule.forRoot({ registry: CONFIG_REGISTRY })]
+})
+export class AppModule {}
+
+// Use with full type safety
+@Injectable()
+export class DatabaseService {
+  constructor(
+    private configService: ConfigService<typeof CONFIG_REGISTRY>
+  ) {}
+
+  connect() {
+    const host = this.configService.get('database.HOST'); // ✅ Type-safe!
+    const port = this.configService.get('database.PORT'); // ✅ Autocomplete works!
+  }
+}
+```
 
 ## 🚀 Getting Started
 
@@ -45,6 +90,18 @@ pnpm run lint
 pnpm run format
 ```
 
+## 📦 Installing @future.ai/config
+
+```bash
+npm install @future.ai/config
+# or
+pnpm add @future.ai/config
+# or  
+yarn add @future.ai/config
+```
+
+See the [full documentation](./packages/config/README.md) for complete setup and usage instructions.
+
 ## 📝 Creating a New Package
 
 Use the provided script to create a new package:
@@ -70,7 +127,7 @@ pnpm run build
 To build a specific package:
 
 ```bash
-cd packages/common
+cd packages/config
 pnpm run build
 ```
 
@@ -85,7 +142,7 @@ pnpm test
 Run tests for a specific package:
 
 ```bash
-cd packages/common
+cd packages/config
 pnpm test
 ```
 
@@ -100,26 +157,33 @@ pnpm login
 To publish all changed packages:
 
 ```bash
-./scripts/publish.sh
+pnpm run publish:all
 ```
 
-This script will:
-1. Ensure you're on the main branch
-2. Run tests
-3. Build all packages
-4. Use Lerna to version and publish packages
+This will automatically:
+1. Detect changed packages since last release
+2. Generate version numbers based on conventional commits
+3. Build packages
+4. Publish to npm
+5. Create git tags
+6. No manual confirmation required (fully automated)
 
 ## 🏗️ Project Structure
 
 ```
 future-ai-libs/
 ├── packages/              # All library packages
-│   └── common/           # Common utilities package
+│   └── config/           # Type-safe configuration management
 │       ├── src/          # Source code
-│       ├── test/         # Tests
+│       │   ├── config.module.ts     # NestJS dynamic module
+│       │   ├── config.service.ts    # Configuration service
+│       │   ├── config.factory.ts    # Factory functions
+│       │   ├── config.type.ts       # TypeScript types
+│       │   └── index.ts             # Exports
+│       ├── test/         # Comprehensive tests
 │       └── package.json  # Package configuration
 ├── scripts/              # Build and utility scripts
-├── lerna.json           # Lerna configuration
+├── lerna.json           # Lerna configuration (fully automated)
 ├── package.json         # Root package.json with workspaces
 ├── tsconfig.json        # Root TypeScript configuration
 └── jest.config.js       # Root Jest configuration
