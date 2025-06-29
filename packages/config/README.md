@@ -58,10 +58,7 @@ import { CONFIG_REGISTRY } from './common/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      registry: CONFIG_REGISTRY,
-      isGlobal: true // Optional, defaults to true
-    })
+    ConfigModule.forRoot({ registry: CONFIG_REGISTRY })
   ]
 })
 export class AppModule {}
@@ -94,47 +91,6 @@ export class DatabaseService {
     // const invalid = this.configService.get('nonexistent'); // ❌ Error!
   }
 }
-```
-
-### Advanced Configuration Patterns
-
-#### Environment-specific Configurations
-
-```typescript
-export const APP_CONFIG_ENTRY = defineConfig('app', () => ({
-  name: 'My NestJS App',
-  environment: process.env.NODE_ENV || 'development',
-  debug: process.env.NODE_ENV === 'development',
-  cors: {
-    origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
-    credentials: true
-  }
-}));
-
-export const REDIS_CONFIG_ENTRY = defineConfig('redis', () => ({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  ttl: parseInt(process.env.REDIS_TTL || '3600'),
-  password: process.env.REDIS_PASSWORD
-}));
-
-export const CONFIG_REGISTRY = {
-  app: APP_CONFIG_ENTRY,
-  postgres: POSTGRES_CONFIG_ENTRY,
-  redis: REDIS_CONFIG_ENTRY,
-} as const; // ⚠️ Never forget 'as const'!
-```
-
-#### Using createConfig for Static Configurations
-
-```typescript
-import { createConfig } from '@future.ai/config';
-
-export const STATIC_CONFIG_ENTRY = createConfig('static', {
-  apiVersion: 'v1',
-  maxUploadSize: 10 * 1024 * 1024, // 10MB
-  supportedFormats: ['jpg', 'png', 'pdf'] as const
-});
 ```
 
 ## 🚨 Why CONFIG_REGISTRY and 'as const' are Critical
@@ -228,22 +184,6 @@ export const DATABASE_CONFIG_ENTRY = defineConfig('database', () => ({
   // ... other db configs
 }));
 ```
-
-## API Reference
-
-### ConfigModule
-
-- `forRoot<TRegistry>(options: ConfigModuleOptions<TRegistry>): DynamicModule`
-
-### ConfigService
-
-- `get<K>(key: K): ConfigMap[K]` - Get configuration by key
-- `get<P>(path: P): PathValue<ConfigMap, P>` - Get configuration by path
-
-### Factory Functions
-
-- `defineConfig<T>(key: string, factory: () => T): ConfigRegistryEntry<T>`
-- `createConfig<T>(key: string, config: T): ConfigRegistryEntry<T>`
 
 ## License
 
