@@ -1,6 +1,6 @@
 {
   "name": "@future.ai/common",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Common utilities and decorators for NestJS applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
