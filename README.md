@@ -57,7 +57,7 @@ export class DatabaseService {
 
 ### Prerequisites
 
-- Node.js >= 16
+- Node.js >= 20
 - pnpm >= 8
 
 ### Installation
