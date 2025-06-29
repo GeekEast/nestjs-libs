@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/future-ai/nestjs-libs/compare/@future.ai/config@0.2.0...@future.ai/config@0.2.1) (2025-06-29)
+
+**Note:** Version bump only for package @future.ai/config
+
 # 0.2.0 (2025-06-29)
 
 ### Features
